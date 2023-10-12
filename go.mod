@@ -25,3 +25,5 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace nhooyr.io/websocket v1.8.7 => github.com/cookieai-jar/websocket v0.0.0-20231012073820-1a02d4fbc597

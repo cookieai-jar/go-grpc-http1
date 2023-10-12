@@ -26,15 +26,16 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/connectivity"
+	"google.golang.org/grpc/credentials"
+
 	"golang.stackrox.io/grpc-http1/internal/grpcproto"
 	"golang.stackrox.io/grpc-http1/internal/grpcweb"
 	"golang.stackrox.io/grpc-http1/internal/httputils"
 	"golang.stackrox.io/grpc-http1/internal/pipeconn"
 	"golang.stackrox.io/grpc-http1/internal/stringutils"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/connectivity"
-	"google.golang.org/grpc/credentials"
 )
 
 func modifyResponse(resp *http.Response) error {
@@ -168,7 +169,7 @@ func ConnectViaProxy(ctx context.Context, endpoint string, tlsClientConf *tls.Co
 	var err error
 
 	if connectOpts.useWebSocket {
-		proxy, dialCtx, err = createClientWSProxy(endpoint, tlsClientConf)
+		proxy, dialCtx, err = createClientWSProxy(endpoint, tlsClientConf, connectOpts.host)
 	} else {
 		proxy, dialCtx, err = createClientProxy(endpoint, tlsClientConf, connectOpts.forceHTTP2, connectOpts.forceDowngrade, connectOpts.extraH2ALPNs)
 	}

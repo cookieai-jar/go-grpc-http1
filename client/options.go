@@ -22,6 +22,7 @@ type connectOptions struct {
 	forceHTTP2     bool
 	forceDowngrade bool
 	useWebSocket   bool
+	host           string
 }
 
 // ConnectOption is an option that can be passed to the `ConnectViaProxy` method.
@@ -94,4 +95,15 @@ type forceDowngradeOption bool
 
 func (o forceDowngradeOption) apply(opts *connectOptions) {
 	opts.forceDowngrade = bool(o)
+}
+
+// HostHeader sets the host header when using websocket proxy, otherwise it is ignored.
+func HostHeader(host string) ConnectOption {
+	return hostOption(host)
+}
+
+type hostOption string
+
+func (o hostOption) apply(opts *connectOptions) {
+	opts.host = string(o)
 }

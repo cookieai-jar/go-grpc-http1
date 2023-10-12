@@ -51,6 +51,7 @@ type http2WebSocketProxy struct {
 	insecure   bool
 	endpoint   string
 	httpClient *http.Client
+	host       string
 }
 
 type websocketConn struct {
@@ -241,6 +242,7 @@ func (h *http2WebSocketProxy) ServeHTTP(w http.ResponseWriter, req *http.Request
 		Subprotocols: subprotocols,
 		// gRPC already performs compression, so no need for WebSocket to add compression as well.
 		CompressionMode: websocket.CompressionDisabled,
+		Host:            h.host,
 	})
 	if resp != nil && resp.Body != nil {
 		// Not strictly necessary because the library already replaces resp.Body with a NopCloser,
@@ -296,7 +298,7 @@ func (h *http2WebSocketProxy) ServeHTTP(w http.ResponseWriter, req *http.Request
 	_ = conn.Close(websocket.StatusNormalClosure, "")
 }
 
-func createClientWSProxy(endpoint string, tlsClientConf *tls.Config) (*http.Server, pipeconn.DialContextFunc, error) {
+func createClientWSProxy(endpoint string, tlsClientConf *tls.Config, host string) (*http.Server, pipeconn.DialContextFunc, error) {
 	handler := &http2WebSocketProxy{
 		insecure: tlsClientConf == nil,
 		endpoint: endpoint,
@@ -305,6 +307,7 @@ func createClientWSProxy(endpoint string, tlsClientConf *tls.Config) (*http.Serv
 				TLSClientConfig: tlsClientConf,
 			},
 		},
+		host: host,
 	}
 	return makeProxyServer(handler)
 }
